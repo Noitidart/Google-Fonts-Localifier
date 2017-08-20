@@ -1,63 +1,144 @@
 // @flow
 
-import { wait } from 'cmn/src/all'
-import { takeEvery, call, put } from 'redux-saga/effects'
+import { takeEvery, select, call, put, fork } from 'redux-saga/effects'
 
-export type Shape = number;
+import { getDownload } from './utils'
 
-const INITIAL = 10;
+import type { Download, DownloadNoUrl } from './types'
+
+export type Shape = {
+    lastId: number,
+    entries: Download[]
+}
+
+const INITIAL = {
+    lastId: -1,
+    entries: []
+}
 export const sagas = [];
 
 const A = ([actionType]: string[]) => 'DOWNLOADS_' + actionType; // Action type prefixer
 
 //
-const UP = A`UP`;
-type UpAction = { type:typeof UP };
-export function up(): UpAction {
+const UPDATE = A`UPDATE`;
+type UpdateAction = { type:typeof UPDATE, id:number, props:DownloadNoUrl };
+function update(id: number, props: {}): UpdateAction {
+    // props is object of new keys to overwrite download with
+    delete props.url;
+    props.updatedAt = Date.now();
     return {
-        type: UP
+        type: UPDATE,
+        id,
+        props
     }
 }
 
 //
-const UP_ASYNC = A`UP_ASYNC`;
-type UpAsyncAction = { type:typeof UP_ASYNC, times:number };
-export function upAsync(times: number = 1): UpAsyncAction {
+const ADD = A`ADD`;
+type AddAction = { type:typeof ADD, download:Download };
+function add(download: Download): AddAction {
     return {
-        type: UP_ASYNC,
-        times
+        type: ADD,
+        download
     }
 }
-const upAsyncWorker = function* upAsyncWorker(action: UpAsyncAction) {
-    for (let i=0; i<action.times; i++) {
-        yield call(wait, 1000);
-        yield put(up());
-    }
-}
-const upAsyncWatcher = function* upAsyncWatcher() {
-    yield takeEvery(UP_ASYNC, upAsyncWorker);
-}
-sagas.push(upAsyncWatcher);
 
 //
-const DN = A`DN`;
-type DownAction = { type:typeof DN };
-export function dn(): DownAction {
+const INCREMENT = A`INCREMENT`;
+type IncrementAction = { type:typeof INCREMENT };
+function increment(): IncrementAction {
     return {
-        type: DN
+        type: INCREMENT
     }
 }
+
+//
+const REQUEST = A`REQUEST`;
+type RequestAction = { type:typeof REQUEST, url:string, promise:*, resolve:*, reject:* };
+export function requestDownload(url: string): RequestAction {
+    let resolve, reject;
+    return {
+        type: REQUEST,
+        url,
+        promise: new Promise( (...args)=>([resolve,reject] = args) ),
+        resolve,
+        reject
+    }
+}
+const requestWorker = function* requestWorker(action: RequestAction) {
+    console.log('ENTERED requestWorker :: downloads');
+    const { url, resolve, reject } = action;
+    let { downloads:state } = yield select();
+
+    console.log('requestWorker, downloads:', state);
+
+    const duplicate = getDownload(url, state);
+    if (duplicate) {
+        console.log('requestWorker, discarding download as already there, duplicate:', duplicate);
+        reject(duplicate.id);
+        return;
+    }
+
+    console.log('downloads, lastId will increment, it is now:', state.lastId);
+    yield put(increment());
+    ({ downloads:state } = yield select());
+    console.log('downloads, lastId incremented, it is now:', state.lastId)
+    const id = state.lastId;
+    resolve(id); // resolve meaning request was accepted
+
+    yield put(add({ id, url, isDownloading:true, createdAt:Date.now() }));
+
+    let res;
+    try {
+        res = yield call(fetch, url);
+    } catch(ex) {
+        yield put(update(id, { isDownloading:false, error:ex.message }));
+        return;
+    }
+
+    if (res.status < 200 || res.status > 299) {
+        yield put(update(id, { isDownloading:false, error:`Fetch failed with ${res.status} status` }))
+        return;
+    }
+
+    const blob = yield res.blob();
+    yield put(update(id, { isDownloading:false, blob }));
+
+}
+const requestWatcher = function* requestWatcher() {
+    yield takeEvery(REQUEST, requestWorker);
+}
+sagas.push(requestWatcher);
 
 //
 type Action =
-  | UpAction
-  | UpAsyncAction
-  | DownAction;
+  | AddAction
+  | IncrementAction
+  | RequestAction
+  | UpdateAction;
 
-export default function reducer(state: Shape = INITIAL, action:Action) {
+export default function reducer(state: Shape = INITIAL, action: Action) {
     switch(action.type) {
-        case UP: return state + 1;
-        case DN: return state - 1;
+        case INCREMENT: {
+            return {
+                ...state,
+                lastId: state.lastId + 1
+            }
+        }
+        case ADD: {
+            const { download } = action;
+            return {
+                ...state,
+                entries: [...state.entries, download]
+            }
+        }
+        case UPDATE: {
+            const { id, props } = action;
+            return {
+                ...state,
+                entries: state.entries.map( download => download.id !== id ? download : { ...download, ...props } )
+            }
+        }
         default: return state;
     }
 }

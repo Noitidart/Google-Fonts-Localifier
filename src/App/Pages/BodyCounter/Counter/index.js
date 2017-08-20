@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { up, dn, upAsync } from '../../../flow-control/counter'
 
 import type { Shape as CounterShape } from '../../../flow-control/counter'
+import type { Shape as AppShape } from '../../../flow-control'
 
 type Props = {
     counter: CounterShape,
@@ -33,7 +34,7 @@ class CounterDumb extends PureComponent<Props, void> {
 }
 
 const CounterSmart = connect(
-    function(state) {
+    function (state: AppShape) {
         return {
             counter: state.counter
         }

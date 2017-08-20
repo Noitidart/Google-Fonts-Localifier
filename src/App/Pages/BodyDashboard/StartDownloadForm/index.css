@@ -1,0 +1,9 @@
+form {
+    text-align: left;
+}
+
+.field--input-row + label {
+    float: left;
+    width: 6em;
+    font-weight: bold;
+}

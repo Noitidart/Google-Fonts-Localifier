@@ -2,7 +2,8 @@
 
 import React, { PureComponent } from 'react'
 
-import Form from './Form'
+import StartDownloadForm from './StartDownloadForm'
+import Fonts from './Fonts'
 
 import './index.css'
 
@@ -13,7 +14,10 @@ class BodyDashboard extends PureComponent<void, void> {
                 <p className="App-intro">
                     Use the form to fetch and download fonts
                 </p>
-                <Form />
+                <div className="dashboard">
+                    <StartDownloadForm />
+                    <Fonts />
+                </div>
             </div>
         )
     }
