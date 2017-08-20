@@ -110,7 +110,7 @@ class FontDumb extends PureComponent<Props, State> {
             const fileName = `${names[0]}---${unicodes}.${ext}`;
             // console.log('fileName:', fileName);
 
-            css = css.replace(orig, `url(${fileName})`);
+            css = css.replace(orig, `url('${fileName}')`);
             zippingDownloads.push(zip.file(fileName, blob));
         }
 

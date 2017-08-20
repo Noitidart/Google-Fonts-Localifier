@@ -9,6 +9,9 @@ import store from './flow-control'
 import Header from './Header'
 import Pages from './Pages'
 
+import './fonts/Product Sans/style.css'
+import './fonts/Roboto/style.css'
+import './fonts/Open Sans/style.css'
 import './index.css'
 
 class App extends PureComponent<void, void> {
