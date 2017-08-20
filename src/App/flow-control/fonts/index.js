@@ -75,7 +75,7 @@ const requestWorker = function* requestWorker(action: RequestAction) {
     resolve(id); // resolve meaning request was accepted
 
 
-    const downloadIds = yield all(extractUrls(css).slice(0,2).map(function*(url) {
+    const downloadIds = yield all(extractUrls(css).map(function*(url) {
         // resolves with downloadId if download created, rejects if already exists
         try {
             const action = yield put(requestDownload(url));
