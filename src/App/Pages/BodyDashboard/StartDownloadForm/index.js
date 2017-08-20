@@ -20,9 +20,6 @@ class StartDownloadFormDumb extends PureComponent<Props, void> {
         this.handleSubmit = this.props.handleSubmit(this.handleSubmit);
     }
 
-    componentDidMount() {
-        this.props.dispatch(this.props.change('url', 'https://fonts.googleapis.com/css?family=Roboto+Slab:100,300,400,700|Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i')); // DEBUG:
-    }
     render() {
         const { submitting, error } = this.props;
         const { handleSubmit } = this;

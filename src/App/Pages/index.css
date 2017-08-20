@@ -1,3 +1,9 @@
 .App-intro {
     font-size: large;
 }
+
+.rehydrating {
+    font-size: 1.8em; /* because header is 2em */
+    font-weight: 300;
+    margin-top: 50px;
+}
