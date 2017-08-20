@@ -2,21 +2,21 @@
 
 import React, { PureComponent } from 'react'
 
-import Form from './Form'
+import Counter from './Counter'
 
 import './index.css'
 
-class BodyDashboard extends PureComponent<void, void> {
+class BodyCounter extends PureComponent<void, void> {
     render() {
         return (
             <div>
                 <p className="App-intro">
-                    Use the form to fetch and download fonts
+                    Let's count! 1... 2... 3!!!
                 </p>
-                <Form />
+                <Counter />
             </div>
         )
     }
 }
 
-export default BodyDashboard
+export default BodyCounter

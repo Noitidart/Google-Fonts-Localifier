@@ -7,10 +7,11 @@ import { reducer as form } from 'redux-form'
 import { fork, all } from 'redux-saga/effects'
 
 import counter, { sagas as counterSagas } from './counter'
+import downloads, { sagas as downloadsSagas } from './downloads'
 
 const sagaMiddleware = createSagaMiddleware();
-const reducers = combineReducers({ counter, form });
-const sagas = [ ...counterSagas ];
+const reducers = combineReducers({ counter, downloads, form });
+const sagas = [ ...counterSagas, ...downloadsSagas ];
 
 const store = createStore(reducers, applyMiddleware(sagaMiddleware));
 

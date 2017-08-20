@@ -1,14 +1,16 @@
 import React, { PureComponent } from 'react'
 import { Route, Switch, withRouter } from 'react-router-dom'
 
+import Body404 from './Body404'
+import BodyCounter from './BodyCounter'
 import BodyDashboard from './BodyDashboard'
 import BodySettings from './BodySettings'
-import Body404 from './Body404'
 
 import './index.css'
 
 const PAGES = [
     { path:'/',           label:'Dashboard', Body:BodyDashboard },
+    { path:'/counter',    label:'Counter',   Body:BodyCounter  },
     { path:'/settings',   label:'Settings',  Body:BodySettings  }
 ]
 
