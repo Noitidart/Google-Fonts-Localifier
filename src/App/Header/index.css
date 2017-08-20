@@ -1,0 +1,23 @@
+.App-logo {
+    animation: App-logo-spin infinite 2s linear;
+    height: 80px;
+}
+
+.App-header {
+    /* background-color: #FF5252; */
+    background-color: #F7F7F7;
+    padding: 20px;
+    color: rgba(0,0,0,0.54);
+}
+
+.App-header h2 {
+    font-family: Product Sans;
+    font-size: 2em;
+    font-weight: 500;
+}
+
+@keyframes App-logo-spin {
+    0%    { transform: scale(0.9); }
+    50%   { transform: scale(1.1); }
+    100%  { transform: scale(0.9); }
+}

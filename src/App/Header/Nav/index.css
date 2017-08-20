@@ -1,0 +1,17 @@
+.nav {
+    font-family: Roboto;
+    text-transform: uppercase;
+    font-weight: 400;
+    letter-spacing: 2px;
+}
+
+.topnav-link-selected {
+    font-weight: 900;
+}
+
+.topnav-link {
+    margin: 0 20px 0 20px;
+    /* color: #FFFFFF; */
+    color: rgba(0,0,0,0.54);
+    text-decoration: none;
+}
