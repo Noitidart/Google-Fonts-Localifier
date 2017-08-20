@@ -17,6 +17,7 @@ import type { Shape as AppShape } from '../../../../flow-control'
 type OwnProps = {
     font: Font
 }
+
 type Props = {
     ...OwnProps,
     downloads: Download[] // only the download entries for this font
@@ -24,8 +25,24 @@ type Props = {
 
 type State = {
     isZipping: false,
-    zipUrl?: *
+    zip?: {
+        url: string, // blob url
+        name: string // name of the zip by font family
+    }
 }
+
+type FamilyName = string;
+type WeightedStyle =
+    | '100' | '100i'
+    | '200' | '200i'
+    | '300' | '300i'
+    | '400' | '400i'
+    | '500' | '500i'
+    | '600' | '600i'
+    | '700' | '700i'
+    | '800' | '800i'
+    | '900' | '900i';
+type Familys = { [FamilyName]:WeightedStyle[] }
 
 class FontDumb extends PureComponent<Props, State> {
     state = {
@@ -34,7 +51,7 @@ class FontDumb extends PureComponent<Props, State> {
     render() {
         const { font, downloads } = this.props;
         const { prepareZip, getZipName, destroyZip } = this;
-        const { isZipping, zipUrl } = this.state;
+        const { isZipping, zip } = this.state;
 
         console.log('font.id:', font.id, 'downloads:', downloads);
         const cntDownloading = downloads.filter( download => download.isDownloading ).length;
@@ -57,8 +74,8 @@ class FontDumb extends PureComponent<Props, State> {
                     </div>
                 }
                 <div className="font--row">
-                    { !zipUrl && <button disabled={isDownloading || isZipping} onClick={prepareZip}>Prepare Zip</button> }
-                    { zipUrl && <a href={zipUrl} download={getZipName()} onClick={destroyZip}>Save Zip As</a> }
+                    { !zip && <button disabled={isDownloading || isZipping} onClick={prepareZip}>Prepare Zip</button> }
+                    { zip && <a href={zip.url} download={zip.name} onClick={destroyZip}>Save Zip As</a> }
                 </div>
             </div>
         )
@@ -68,10 +85,6 @@ class FontDumb extends PureComponent<Props, State> {
         // URL.revokeObjectURL(this.state.zipUrl);
         // this.setState(() => ({ zipUrl:undefined }));
     }
-    getZipName = () => {
-        const familys = this.props.font.url.match(/[=|]([^:]+)/g);
-        return familys.map(family => family.substr(1).replace(/\+/g, ' ')).join('--') + '.zip';
-    }
     prepareZip = async () => {
         this.setState(() => ({ isZipping:true }));
         const { font, downloads } = this.props;
@@ -79,9 +92,13 @@ class FontDumb extends PureComponent<Props, State> {
         const zip = new Zip();
 
         let css = font.css;
+        console.log('css orig:', css);
         let ix = 0;
 
         const zippingDownloads = [];
+        const familys:Familys = {};
+        const familyWeights = {};
+        const familyStyles = {};
         for (const download of downloads) {
             const { url, blob } = download;
             const ext = url.substr(url.lastIndexOf('.')+1);
@@ -95,16 +112,22 @@ class FontDumb extends PureComponent<Props, State> {
             let cssBlock = css.substr(ixOpen, len);
             cssBlock = cssBlock.substr(cssBlock.lastIndexOf('{'));
             // console.log('cssBlock:', cssBlock);
-            const weight = cssBlock.match(/font-weight: (\d+)/)[1];
+            let weight = cssBlock.match(/font-weight: (\d+)/);
+            weight = weight ? weight[1] : 400;
             // console.log('weight:', weight);
-            const style = cssBlock.match(/font-style: ([^;]+)/)[1];
+            let style = cssBlock.match(/font-style: ([^;]+)/);
+            style = style ? style[1] : 'normal'; // css default
             // console.log('style:', style);
             const family = cssBlock.match(/font-family: ([^;]+)/)[1].replace(/['"]/g, '');
             // console.log('family:', family);
             const names = cssBlock.match(/local\('[^']+/g).map( name => name.substr(name.indexOf(`'`)+1) );
             // console.log('names:', names);
-            const unicodes = cssBlock.match(/unicode-range: ([^;]+)/)[1].replace(/, /g, '--');
+            let unicodes = cssBlock.match(/unicode-range: ([^;]+)/);
+            unicodes = unicodes ? unicodes[1].replace(/, /g, '--') : 'U+0-10FFFF';
             // console.log('unicodes:', unicodes);
+
+            if (!familys[family]) familys[family] = {};
+            familys[family][`${weight}${style === 'italic' ? 'i' : ''}`] = 1;
 
             // const fileName = `${family}---${weight}---${unicodes}.${ext}`;
             const fileName = `${names[0]}---${unicodes}.${ext}`;
@@ -114,7 +137,9 @@ class FontDumb extends PureComponent<Props, State> {
             zippingDownloads.push(zip.file(fileName, blob));
         }
 
+        console.log('familys:', familys);
         await Promise.all(zippingDownloads);
+
 
         zip.file('style.css', css);
 
@@ -122,7 +147,17 @@ class FontDumb extends PureComponent<Props, State> {
         console.log('blob:', blob);
         const url = URL.createObjectURL(blob);
         console.log('url:', url);
-        this.setState(() => ({ isZipping:false, zipUrl:url }));
+        const name = this.getFileName(familys);
+        this.setState(() => ({ isZipping:false, zip:{ url, name } }));
+    }
+    getFileName(familys:Familys) {
+        const name = [];
+
+        for (const [familyName, weightedStyles] of Object.entries(familys)) {
+            name.push(familyName + '-' + Object.keys(weightedStyles).sort().join(','));
+        }
+
+        return name.sort().join('--') + '.zip';
     }
 }
 

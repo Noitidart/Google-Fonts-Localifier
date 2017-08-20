@@ -50,7 +50,7 @@ const PagesSmart = connect(
 
 const PagesRouted = withRouter
 
-const Pages = PagesSmart(PagesRouted(PagesDumb))
+const Pages = PagesRouted(PagesSmart(PagesDumb))
 
 export { PAGES }
 export default Pages

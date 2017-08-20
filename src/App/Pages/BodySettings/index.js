@@ -2,6 +2,8 @@
 
 import React, { PureComponent } from 'react'
 
+import { persist } from '../../flow-control'
+
 import './index.css'
 
 class BodySettings extends PureComponent<void, void> {
@@ -11,9 +13,14 @@ class BodySettings extends PureComponent<void, void> {
                 <p className="App-intro">
                     Customize your experience
                 </p>
-                Settings
+                <b>Memory</b> <button onClick={this.purgeStore}>Clear Memory</button>
             </div>
         )
+    }
+
+    purgeStore() {
+        persist.purge();
+        alert('Memory was cleared! On the next load of app, none of the current state will be restored. Unless you do more actions right now, that cause the state to be saved again.')
     }
 }
 
