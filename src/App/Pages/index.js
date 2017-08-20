@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react'
-import { connect } from 'react-redux'
 import { Route, Switch, withRouter } from 'react-router-dom'
 
 import BodyDashboard from './BodyDashboard'
