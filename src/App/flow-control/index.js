@@ -35,7 +35,7 @@ function* rootSaga() {
 }
 sagaMiddleware.run(rootSaga);
 
-export const persist = persistStore(store, { blacklist:['form','rehydrated'] });
+export const persistor = persistStore(store, { blacklist:['form','rehydrated'] });
 
 // store.subscribe(function() {
 //     console.log('store updated:', store.getState());

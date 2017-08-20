@@ -2,7 +2,7 @@
 
 import React, { PureComponent } from 'react'
 
-import { persist } from '../../flow-control'
+import { persistor } from '../../flow-control'
 
 import './index.css'
 
@@ -19,7 +19,7 @@ class BodySettings extends PureComponent<void, void> {
     }
 
     purgeStore() {
-        persist.purge();
+        persistor.purge();
         alert('Memory was cleared! On the next load of app, none of the current state will be restored. Unless you do more actions right now, that cause the state to be saved again.')
     }
 }

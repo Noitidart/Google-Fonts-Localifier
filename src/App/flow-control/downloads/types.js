@@ -9,7 +9,7 @@ export type Download = {
     error?: string,
     createdAt: Date,
     finishedAt?: Date,
-    blob: *
+    dataurl: string // data
 }
 
 export type DownloadNoUrl = $Diff<Download, { url:string }> // TODO: flowtype object must have keys except (must have's optional)

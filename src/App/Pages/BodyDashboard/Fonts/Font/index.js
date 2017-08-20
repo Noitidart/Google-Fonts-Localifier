@@ -100,7 +100,7 @@ class FontDumb extends PureComponent<Props, State> {
         const familyWeights = {};
         const familyStyles = {};
         for (const download of downloads) {
-            const { url, blob } = download;
+            const { url, dataurl } = download;
             const ext = url.substr(url.lastIndexOf('.')+1);
             const orig = `url(${url})`;
 
@@ -134,7 +134,7 @@ class FontDumb extends PureComponent<Props, State> {
             // console.log('fileName:', fileName);
 
             css = css.replace(orig, `url('${fileName}')`);
-            zippingDownloads.push(zip.file(fileName, blob));
+            zippingDownloads.push(zip.file(fileName, dataurl.substr(dataurl.indexOf('base64,')+'base64,'.length), { base64:true }));
         }
 
         console.log('familys:', familys);

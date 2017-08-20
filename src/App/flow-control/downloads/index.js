@@ -2,7 +2,7 @@
 
 import { takeEvery, select, call, put, fork } from 'redux-saga/effects'
 
-import { getDownload } from './utils'
+import { getDownload, blobToDataUrl } from './utils'
 
 import type { Download, DownloadNoUrl } from './types'
 
@@ -102,7 +102,10 @@ const requestWorker = function* requestWorker(action: RequestAction) {
     }
 
     const blob = yield res.blob();
-    yield put(update(id, { isDownloading:false, blob }));
+
+    const dataurl = yield call(blobToDataUrl, blob);
+
+    yield put(update(id, { isDownloading:false, dataurl }));
 
 }
 const requestWatcher = function* requestWatcher() {
