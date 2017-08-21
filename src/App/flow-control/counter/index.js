@@ -1,6 +1,6 @@
 // @flow
 
-import { wait } from 'cmn/src/all'
+import { wait } from 'cmn/lib/all'
 import { takeEvery, call, put } from 'redux-saga/effects'
 
 export type Shape = number;

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { SubmissionError, Field, reduxForm } from 'redux-form'
 
-import { timeout } from 'cmn/src/all'
+import { timeout } from 'cmn/lib/all'
 import { requestFontAdd } from '../../../flow-control/fonts'
 import { requestDownload } from '../../../flow-control/downloads'
 

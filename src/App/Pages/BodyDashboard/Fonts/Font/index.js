@@ -4,8 +4,8 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import Zip from 'jszip'
 
-import { depth0Or1Equal } from 'cmn/src/recompose'
-import { arrayToObject, wait } from 'cmn/src/all'
+import { depth0Or1Equal } from 'cmn/lib/recompose'
+import { arrayToObject, wait } from 'cmn/lib/all'
 
 import './index.css'
 
@@ -97,8 +97,7 @@ class FontDumb extends PureComponent<Props, State> {
 
         const zippingDownloads = [];
         const familys:Familys = {};
-        const familyWeights = {};
-        const familyStyles = {};
+        const fontNames = {};
         for (const download of downloads) {
             const { url, dataurl } = download;
             const ext = url.substr(url.lastIndexOf('.')+1);
@@ -130,7 +129,11 @@ class FontDumb extends PureComponent<Props, State> {
             familys[family][`${weight}${style === 'italic' ? 'i' : ''}`] = 1;
 
             // const fileName = `${family}---${weight}---${unicodes}.${ext}`;
-            const fileName = `${names[0]}---${unicodes}.${ext}`;
+            const fontName = names[0];
+            if (!fontNames[fontName]) fontNames[fontName] = 0;
+            const fontNameId = fontNames[fontName]++;
+            const fileName = `${fontName}-${fontNameId}.${ext}`;
+            // const fileName = `${fontName}---${unicodes}.${ext}`;
             // console.log('fileName:', fileName);
 
             css = css.replace(orig, `url('${fileName}')`);

@@ -18,7 +18,7 @@ class App extends PureComponent<void, void> {
     render() {
         return (
             <Provider store={store}>
-                <BrowserRouter>
+                <BrowserRouter basename="Google-Fonts-Localifier">
                     <div className="App">
                         <Header />
                         <Pages />
